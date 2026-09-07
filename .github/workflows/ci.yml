@@ -1,0 +1,25 @@
+name: Build site
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Build
+        run: python3 scripts/build.py
+      - name: Smoke test
+        run: |
+          test -f public/index.html
+          test -f public/robots.txt
+          test -f public/sitemap.xml
+          test -f public/llms.txt
+          test -f public/agent-index.json

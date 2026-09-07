@@ -1,0 +1,31 @@
+site:
+  name: "TandemNest"
+  description: "Practical guides, tools and experiments for autonomous agents, compute and crypto."
+  url: "https://tandemnest.com"
+  language: "en"
+  author: ""
+  default_og_image: "/assets/og-default.svg"
+
+monetization:
+  xmr_mining:
+    enabled: false
+    wallet_address: ""
+    pool_referral_url: ""
+  runpod:
+    enabled: false
+    referral_url: ""
+  digitalocean:
+    enabled: false
+    referral_url: ""
+  generic:
+    affiliate_disclosure: "Some links on this site may be referral links. If you use them, I may receive a commission or account credit at no extra cost to you."
+
+seo:
+  title_suffix: " | TandemNest"
+  robots: "index,follow"
+  sitemap: true
+  schema_org: true
+
+build:
+  output_dir: "public"
+  site_dir: "."

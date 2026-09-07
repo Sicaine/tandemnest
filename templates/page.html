@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ description }}">
+  <meta name="robots" content="{{ robots }}">
+  <link rel="canonical" href="{{ canonical }}">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ canonical }}">
+  <meta property="og:image" content="{{ og_image }}">
+  <link rel="stylesheet" href="{{ root_prefix }}assets/site.css">
+  <link rel="icon" href="{{ root_prefix }}assets/favicon.svg" type="image/svg+xml">
+  {{ schema }}
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap nav">
+    <a class="brand" href="{{ root_prefix }}">{{ site_name }}</a>
+    <nav>
+      <a href="{{ root_prefix }}compute/">Compute</a>
+      <a href="{{ root_prefix }}ai/">AI</a>
+      <a href="{{ root_prefix }}crypto/">Crypto</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap prose">
+{{ content }}
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p>{{ affiliate_disclosure }}</p>
+    <p><a href="{{ root_prefix }}robots.txt">Robots</a> · <a href="{{ root_prefix }}sitemap.xml">Sitemap</a></p>
+  </div>
+</footer>
+</body>
+</html>
