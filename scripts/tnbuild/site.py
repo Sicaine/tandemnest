@@ -597,6 +597,20 @@ def write_datasets(out: pathlib.Path, cfg: dict, datasets: dict) -> None:
         (data_dir / f"{name}.csv").write_text(buf.getvalue(), encoding="utf-8")
 
 
+def write_cname(out: pathlib.Path, cfg: dict) -> None:
+    """Write a CNAME file so GitHub Pages keeps the custom domain attached.
+
+    GitHub Pages re-reads this from the published artifact on every deploy; a
+    deploy without it can drop a custom domain back to the *.github.io URL.
+    Derived from site.url so it can never disagree with the canonical tags.
+    """
+    from urllib.parse import urlparse
+
+    host = urlparse(cfg["site"]["url"]).hostname
+    if host and host != "localhost":
+        (out / "CNAME").write_text(host + "\n", encoding="utf-8")
+
+
 def write_headers(out: pathlib.Path) -> None:
     """Emit a Cloudflare Pages `_headers` file.
 

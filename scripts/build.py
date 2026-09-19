@@ -122,6 +122,7 @@ def main() -> int:
     site.write_agent_index(out, cfg, pages, datasets)
     site.write_feed(out, cfg, pages)
     site.write_headers(out)
+    site.write_cname(out, cfg)
 
     # 5. The private task file must never reach the output.
     for name in checks.PRIVATE_FILES:

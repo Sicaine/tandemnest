@@ -1,12 +1,13 @@
 # Deploying TandemNest
 
-Target architecture, unchanged:
+Target architecture:
 
 ```text
-GitHub → Cloudflare Pages → tandemnest.com
+GitHub → GitHub Actions → GitHub Pages → tandemnest.com
 ```
 
-No VPS, no database, no server-side runtime, no paid service.
+`.github/workflows/pages.yml` builds and deploys on every push to `main`. No VPS,
+no database, no server-side runtime, no paid service.
 
 ## 1. Check locally first
 
@@ -33,44 +34,36 @@ git push -u origin main
 
 `public/` is gitignored. Do not commit build output — Cloudflare builds it.
 
-## 3. Create the Cloudflare Pages project
+## 3. Enable GitHub Pages
 
-Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
+Repository **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 
-| Setting | Value |
-| --- | --- |
-| Framework preset | None |
-| Build command | `python3 scripts/build.py --check` |
-| Build output directory | `public` |
-| Root directory | `/` |
+That is the only setting required. The workflow does the rest: it builds with
+`python3 scripts/build.py --check`, uploads `public/`, and deploys. Nothing to install
+and no secrets to configure — the build uses only the Python standard library.
 
-No environment variables are needed, and there is nothing to install: the build uses
-only the Python standard library.
+**The `--check` flag is deliberate.** It turns a broken link, an unverifiable crypto
+address or a secret-shaped string into a failed deploy rather than a published mistake.
 
-**Use `--check`.** It turns a broken link, an unverifiable crypto address or a
-secret-shaped string into a failed deploy instead of a published mistake.
+## 4. The custom domain
 
-## 4. Attach the domain
+`Settings → Pages → Custom domain` → `tandemnest.com`, and enable **Enforce HTTPS**
+once the certificate is issued.
 
-In the Pages project → **Custom domains** → add `tandemnest.com`, then add
-`www.tandemnest.com` and let Cloudflare redirect it to the apex. Two hostnames serving
-the same content is a genuine duplicate-content problem; one must redirect.
+The build also writes `public/CNAME` from `site.url`, because GitHub Pages reads that
+file from the published artifact on every deploy and a deploy without it can drop the
+custom domain back to the `github.io` URL. The file and the canonical tags therefore
+come from the same source and cannot disagree.
 
-Every page declares `https://tandemnest.com/…` as its canonical URL, so until the domain
-is attached those canonicals point at a host that does not serve the site.
+DNS at your registrar: an `ALIAS`/`ANAME` or four `A` records for the apex pointing at
+GitHub Pages' addresses, plus a `CNAME` for `www` pointing at `sicaine.github.io`.
+GitHub's Pages settings page shows the current addresses to use.
 
-## 5. Leave the security settings alone
-
-This matters more than it sounds.
-
-**Do not enable** Bot Fight Mode, an aggressive WAF ruleset, or "I'm Under Attack" mode.
-They serve JavaScript challenges that crawlers cannot pass, which would make the site
-invisible to Google, to AI search crawlers, and to the user-directed fetchers that
-retrieve a page when someone asks an assistant about it — the entire audience this site
-was built for.
-
-A static site with no forms, no database and no server-side code has nothing for those
-features to protect. Cloudflare's defaults are already appropriate.
+**Note on `_headers`.** The build emits one, but it is a Cloudflare Pages format and
+**GitHub Pages ignores it** — GitHub Pages cannot serve custom headers at all. So the
+content security policy and cache-control rules described in it are not active on this
+host. It is kept because it costs nothing and applies immediately if the site ever moves
+behind Cloudflare. Nothing on the site depends on those headers to function.
 
 ## 6. Verify the deployment
 

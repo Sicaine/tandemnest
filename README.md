@@ -14,7 +14,7 @@ content/*.md  +  data/*.yaml  +  config.yaml
                      │
                   public/               (deterministic output)
                      │
-        GitHub → Cloudflare Pages → tandemnest.com
+   GitHub Actions → GitHub Pages → tandemnest.com
 ```
 
 ## Quick start
@@ -54,8 +54,9 @@ CI additionally asserts the build is byte-for-byte reproducible and that
 
 Alongside the pages, every build emits `robots.txt`, `sitemap.xml`, `llms.txt`,
 `agent-index.json`, `feed.xml`, a JSON and CSV file per dataset, and a Cloudflare Pages
-`_headers` file carrying a strict content security policy (the site loads nothing from
-any other origin) plus CORS on the datasets so they can be fetched cross-origin.
+`CNAME` file (so GitHub Pages keeps the custom domain across deploys), and a `_headers`
+file. The latter is a Cloudflare Pages format that GitHub Pages ignores — it is kept
+only so the policy travels with the site if it ever moves hosts.
 
 ### Regenerating the social image
 
@@ -147,5 +148,8 @@ Never commit: private keys, seed phrases, API tokens, passwords, `.env` files.
 
 ## Deployment
 
-See [`DEPLOY.md`](DEPLOY.md). `public/` is gitignored on purpose: Cloudflare Pages runs
-the build itself, so committing the output would only create drift.
+`.github/workflows/pages.yml` builds and deploys to GitHub Pages on every push to
+`main`. See [`DEPLOY.md`](DEPLOY.md).
+
+`public/` is gitignored on purpose: the workflow builds it, so committing the output
+would only create drift between source and what is served.
