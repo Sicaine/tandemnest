@@ -1,0 +1,129 @@
+name: "inference-api-pricing"
+title: "Hosted inference API prices, USD per million tokens"
+description: >
+  Published per-token prices for hosted language model APIs, read from each provider's
+  own pricing page on 19 September 2026. Input and output are listed separately because
+  output typically costs several times more and the ratio drives the total.
+observed: "2026-09-19"
+method: >
+  Standard published rates on the observation date, excluding batch discounts, prompt
+  caching discounts and negotiated enterprise pricing, all of which change the effective
+  price substantially. Where a provider prices by time of day or context length, the
+  variant is named in the notes column.
+license: "CC BY 4.0"
+license_url: "https://creativecommons.org/licenses/by/4.0/"
+columns:
+  - key: provider
+    label: "Provider"
+  - key: model
+    label: "Model"
+  - key: usd_per_m_input
+    label: "USD/1M in"
+    type: money
+    unit: "USD per million input tokens"
+  - key: usd_per_m_output
+    label: "USD/1M out"
+    type: money
+    unit: "USD per million output tokens"
+  - key: notes
+    label: "Notes"
+  - key: source
+    label: "Source"
+    type: url
+rows:
+  - provider: "Anthropic"
+    model: "Claude Opus 5"
+    usd_per_m_input: 5.00
+    usd_per_m_output: 25.00
+    notes: "Fast mode billed at 2x"
+    source: "https://claude.com/pricing"
+  - provider: "Anthropic"
+    model: "Claude Sonnet 5"
+    usd_per_m_input: 2.00
+    usd_per_m_output: 10.00
+    notes: ""
+    source: "https://claude.com/pricing"
+  - provider: "Anthropic"
+    model: "Claude Haiku 4.5"
+    usd_per_m_input: 1.00
+    usd_per_m_output: 5.00
+    notes: ""
+    source: "https://claude.com/pricing"
+  - provider: "OpenAI"
+    model: "gpt-5.6-terra"
+    usd_per_m_input: 2.00
+    usd_per_m_output: 12.00
+    notes: ""
+    source: "https://developers.openai.com/api/docs/pricing"
+  - provider: "OpenAI"
+    model: "gpt-5.6-luna"
+    usd_per_m_input: 0.20
+    usd_per_m_output: 1.20
+    notes: "Small tier"
+    source: "https://developers.openai.com/api/docs/pricing"
+  - provider: "OpenAI"
+    model: "gpt-5-nano"
+    usd_per_m_input: 0.05
+    usd_per_m_output: 0.40
+    notes: "Legacy, still listed"
+    source: "https://developers.openai.com/api/docs/pricing"
+  - provider: "Google"
+    model: "Gemini 3.8 Flash"
+    usd_per_m_input: 0.75
+    usd_per_m_output: 3.75
+    notes: ""
+    source: "https://ai.google.dev/gemini-api/docs/pricing"
+  - provider: "Google"
+    model: "Gemini 3.1 Flash-Lite"
+    usd_per_m_input: 0.25
+    usd_per_m_output: 1.50
+    notes: ""
+    source: "https://ai.google.dev/gemini-api/docs/pricing"
+  - provider: "DeepSeek"
+    model: "deepseek-flash (V4.1)"
+    usd_per_m_input: 0.15
+    usd_per_m_output: 0.60
+    notes: "Off-peak rate; peak is 2x. Cache hits far cheaper"
+    source: "https://api-docs.deepseek.com/quick_start/pricing"
+  - provider: "DeepSeek"
+    model: "deepseek-v4-pro"
+    usd_per_m_input: 0.66
+    usd_per_m_output: 1.98
+    notes: "Off-peak rate; peak is 2x"
+    source: "https://api-docs.deepseek.com/quick_start/pricing"
+  - provider: "Together AI"
+    model: "Llama 3.3 70B"
+    usd_per_m_input: 1.04
+    usd_per_m_output: 1.04
+    notes: "Open weights, flat rate both directions"
+    source: "https://www.together.ai/pricing"
+  - provider: "Together AI"
+    model: "Qwen3.5-397B-A17B"
+    usd_per_m_input: 0.60
+    usd_per_m_output: 3.60
+    notes: "Open-weight MoE; cached input 0.35"
+    source: "https://www.together.ai/pricing"
+  - provider: "Groq"
+    model: "openai/gpt-oss-120b"
+    usd_per_m_input: 0.15
+    usd_per_m_output: 0.60
+    notes: "Open weights; cached input 0.075"
+    source: "https://console.groq.com/docs/models"
+  - provider: "Groq"
+    model: "openai/gpt-oss-20b"
+    usd_per_m_input: 0.075
+    usd_per_m_output: 0.30
+    notes: "Open weights"
+    source: "https://console.groq.com/docs/models"
+  - provider: "Fireworks AI"
+    model: "DeepSeek V4 Pro 0813"
+    usd_per_m_input: 1.32
+    usd_per_m_output: 3.96
+    notes: ""
+    source: "https://docs.fireworks.ai/serverless/pricing"
+  - provider: "OpenRouter"
+    model: "meta-llama/llama-3.3-70b-instruct"
+    usd_per_m_input: 0.10
+    usd_per_m_output: 0.32
+    notes: "Aggregator listing; routes to third-party hosts"
+    source: "https://openrouter.ai/api/v1/models"

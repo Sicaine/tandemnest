@@ -1,40 +1,60 @@
 <!doctype html>
 <html lang="{{ lang }}">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ title }}</title>
-  <meta name="description" content="{{ description }}">
-  <meta name="robots" content="{{ robots }}">
-  <link rel="canonical" href="{{ canonical }}">
-  <meta property="og:title" content="{{ title }}">
-  <meta property="og:description" content="{{ description }}">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="{{ canonical }}">
-  <meta property="og:image" content="{{ og_image }}">
-  <link rel="stylesheet" href="{{ root_prefix }}assets/site.css">
-  <link rel="icon" href="{{ root_prefix }}assets/favicon.svg" type="image/svg+xml">
-  {{ schema }}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+<meta name="robots" content="{{ robots }}">
+<link rel="canonical" href="{{ canonical }}">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:locale" content="{{ locale }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ description }}">
+<meta name="twitter:image" content="{{ og_image }}">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/atom+xml" title="{{ site_name }}" href="/feed.xml">
+{{ schema }}
 </head>
-<body>
+<body class="{{ body_class }}">
+<a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-  <div class="wrap nav">
-    <a class="brand" href="{{ root_prefix }}">{{ site_name }}</a>
-    <nav>
-      <a href="{{ root_prefix }}compute/">Compute</a>
-      <a href="{{ root_prefix }}ai/">AI</a>
-      <a href="{{ root_prefix }}crypto/">Crypto</a>
-    </nav>
+  <div class="wrap header-inner">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span>{{ site_name }}</a>
+    <nav class="mainnav" aria-label="Sections">{{ nav }}</nav>
   </div>
 </header>
-<main class="wrap prose">
+<main id="main" class="wrap">
+{{ breadcrumbs }}
+{{ dates }}
+<article class="prose">
 {{ content }}
+</article>
 </main>
 <footer class="site-footer">
   <div class="wrap">
-    <p>{{ affiliate_disclosure }}</p>
-    <p><a href="{{ root_prefix }}robots.txt">Robots</a> · <a href="{{ root_prefix }}sitemap.xml">Sitemap</a></p>
+    <p class="disclosure-short">{{ disclosure_short }}</p>
+    <nav class="footnav" aria-label="Site information">
+      <a href="/about/">About</a>
+      <a href="/about/disclosure/">Disclosure</a>
+      <a href="/about/methodology/">Methodology</a>
+      <a href="/data/">Data</a>
+      <a href="/sitemap.xml">Sitemap</a>
+      <a href="/llms.txt">llms.txt</a>
+      <a href="/agent-index.json">agent-index.json</a>
+      <a href="/feed.xml">Feed</a>
+    </nav>
+    {{ site_meta }}
+    <p class="colophon">&copy; {{ year }} {{ site_name }}. Built as static HTML; no tracking scripts, no cookies, no JavaScript required to read anything here.</p>
   </div>
 </footer>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>

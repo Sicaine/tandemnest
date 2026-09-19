@@ -1,0 +1,72 @@
+name: "self-host-throughput"
+title: "Published throughput measurements for self-hosted open-weight models"
+description: >
+  Cited output-token throughput figures for open-weight models served on rented GPUs.
+  This is the weakest input in any GPU-versus-API comparison and the one most often
+  quoted without its conditions, so every row records the hardware, the batch or
+  concurrency level, the serving stack, and an assessment of how much weight the figure
+  deserves.
+observed: "2026-09-19"
+method: >
+  Collected from published benchmarks rather than measured here; TandemNest has not
+  reproduced these numbers and does not claim to have. Rows are included only where the
+  source states the hardware and the serving stack. Figures circulating without a
+  disclosed batch size or methodology were rejected rather than averaged in. The spread
+  across these rows is roughly two orders of magnitude, and that spread is real: it is
+  driven by model size, quantisation and batching, not by measurement noise.
+license: "CC BY 4.0"
+license_url: "https://creativecommons.org/licenses/by/4.0/"
+columns:
+  - key: model
+    label: "Model"
+  - key: hardware
+    label: "Hardware"
+  - key: output_tps
+    label: "Output tokens/sec"
+    type: number
+    unit: "output tokens per second, aggregate across the deployment"
+  - key: concurrency
+    label: "Batch / concurrency"
+  - key: stack
+    label: "Serving stack"
+  - key: quality
+    label: "How much to trust it"
+  - key: source
+    label: "Source"
+    type: url
+rows:
+  - model: "DeepSeek-V3 671B, AWQ 4-bit"
+    hardware: "8x H100"
+    output_tps: 33
+    concurrency: "1 (single stream)"
+    stack: "vLLM 0.7.3, TP=8"
+    quality: "Moderate. Individual author, but batch size and sequence lengths fully disclosed"
+    source: "https://github.com/dzhsurf/deepseek-v3-r1-deploy-and-benchmarks"
+  - model: "DeepSeek-V3 671B, AWQ 4-bit"
+    hardware: "8x H100"
+    output_tps: 620
+    concurrency: "~100 concurrent requests"
+    stack: "vLLM 0.7.3, TP=8"
+    quality: "Moderate. Same source and setup as the row above; the pair isolates the batching effect"
+    source: "https://github.com/dzhsurf/deepseek-v3-r1-deploy-and-benchmarks"
+  - model: "Llama 3.1 405B, FP8"
+    hardware: "8x H100 SXM"
+    output_tps: 292
+    concurrency: "~2.8 requests/sec, 1024 in / 128 out"
+    stack: "vLLM"
+    quality: "Strong source (official vLLM blog), but labelled preliminary and the output length is short"
+    source: "https://blog.vllm.ai/2024/07/23/llama31.html"
+  - model: "Llama 3 8B, bf16"
+    hardware: "1x A100 80GB SXM"
+    output_tps: 5000
+    concurrency: "Not disclosed (engine defaults, offline batch)"
+    stack: "SGLang v0.2"
+    quality: "Weak as a planning number. Official SGLang blog, but batch size is unstated and the value is read off a chart"
+    source: "https://lmsys.org/blog/2024-07-25-sglang-llama3/"
+  - model: "Llama 2 70B"
+    hardware: "1x H100 (derived: 8-GPU MLPerf result divided by 8)"
+    output_tps: 2689
+    concurrency: "MLPerf server scenario"
+    stack: "TensorRT-LLM"
+    quality: "Audited MLPerf result, but a different serving stack and the per-GPU split is our own arithmetic"
+    source: "https://developer.nvidia.com/blog/nvidia-blackwell-platform-sets-new-llm-inference-records-in-mlperf-inference-v4-1/"

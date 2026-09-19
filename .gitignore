@@ -1,7 +1,28 @@
-.DS_Store
-.venv/
-__pycache__/
-*.pyc
+# Generated output. Cloudflare Pages runs the build itself, so committing the
+# result would only create drift between source and what is served.
+/public/
+
+# PRIVATE. Owner task list: never commit, never publish, never link.
+TODO STEP BY STEP.html
+
+# Secrets
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+id_rsa*
+*.p12
+credentials.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

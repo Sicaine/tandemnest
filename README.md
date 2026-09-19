@@ -1,60 +1,151 @@
 # TandemNest
 
-**TandemNest** is an experiment in building useful, machine-readable technical resources that can monetize high-intent traffic from humans and autonomous agents.
+Source for [tandemnest.com](https://tandemnest.com) — dated, sourced cost research on GPU
+rental, LLM inference pricing and agent payment rails.
 
-The project is intentionally static-first and costs almost nothing to operate.
-
-## Architecture
+The site is static HTML built by a small Python program with **no third-party
+dependencies**, so it builds identically on a laptop, in CI, and on Cloudflare Pages
+with no install step.
 
 ```text
-GitHub → Cloudflare Pages → tandemnest.com
-                         ↓
-                    static HTML
-                         ↓
-              humans + search + agents
-                         ↓
-          referrals / tools / data / services
+content/*.md  +  data/*.yaml  +  config.yaml
+                     │
+              scripts/build.py          (stdlib only)
+                     │
+                  public/               (deterministic output)
+                     │
+        GitHub → Cloudflare Pages → tandemnest.com
 ```
 
-No VPS, database, server-side runtime, or paid analytics is required for the initial experiment.
-
-## Build
-
-Requires Python 3.10+ and no third-party packages:
+## Quick start
 
 ```bash
-make build
-make serve
+make serve      # build and serve on http://localhost:8000
+make validate   # unit tests + build + output validation — run before pushing
 ```
 
-## Configure
+| Target | What it does |
+| --- | --- |
+| `make build` | Build into `public/` |
+| `make check` | Build, then validate the generated output |
+| `make test` | Unit tests for the build toolchain |
+| `make validate` | `test` + `check`; the full gate |
+| `make clean` | Remove `public/` |
 
-Edit `config.yaml` with:
+Requires Python 3.10+. Nothing else.
 
-- the production URL (`https://tandemnest.com`)
-- a public XMR receiving address for the crypto experiment
-- RunPod referral URL when available
-- DigitalOcean referral URL when available
+## What the build refuses to publish
 
-Never commit credentials, private wallet material, API tokens, or passwords.
+`make check` is a real gate, not a formality. The build fails — writing nothing — if:
 
-## Content philosophy
+- a configured **Bitcoin or Monero address fails its checksum** (Base58Check, bech32 per BIP-173, bech32m per BIP-350, or Monero's Keccak-256)
+- anything **credential-shaped** appears in the source or the output (private keys, API tokens, JWTs, recovery-phrase-shaped lines)
+- an **internal link does not resolve**
+- two pages share a **canonical URL** or a **`<title>`**
+- a page has no `h1`, more than one `h1`, no meta description, or an `img` with no `alt`
+- a **shortcode or template placeholder was left unexpanded**
+- the **sitemap** lists a page that was not generated
+- the **private task file** reaches the output directory
 
-This is **not** an AI-content-volume experiment. Publish fewer pages that contain original calculations, current source links, useful comparisons, executable examples, or other information worth visiting.
+CI additionally asserts the build is byte-for-byte reproducible and that
+`TODO STEP BY STEP.html` is not tracked by git.
 
-The monetization must be obvious and disclosed. Referral links use `nofollow sponsored`.
+## Generated output
 
-## Agent-facing resources
+Alongside the pages, every build emits `robots.txt`, `sitemap.xml`, `llms.txt`,
+`agent-index.json`, `feed.xml`, a JSON and CSV file per dataset, and a Cloudflare Pages
+`_headers` file carrying a strict content security policy (the site loads nothing from
+any other origin) plus CORS on the datasets so they can be fetched cross-origin.
 
-The build generates:
+### Regenerating the social image
 
-- `/llms.txt` — compact model-readable site index
-- `/agent-index.json` — machine-readable page index
-- `/robots.txt`
-- `/sitemap.xml`
+`static/og-default.png` is committed so the build stays dependency-free. Rebuild it from
+its source after changing the wording:
 
-These are experimental conveniences, not a claim that any particular crawler will use them.
+```bash
+chromium --headless --screenshot=static/og-default.png \
+         --window-size=1200,630 design/og-default.svg
+```
+
+## Layout
+
+```text
+config.yaml              Site config. PUBLIC VALUES ONLY — it is all published.
+content/**/*.md          Pages: YAML front matter + Markdown + shortcodes.
+data/*.yaml              Datasets, rendered into tables and published as JSON + CSV.
+templates/page.html      The page shell.
+templates/tools/*.html   Interactive tools, embedded with {{tool:name}}.
+static/                  CSS, JS, icons → copied to /assets/.
+design/                  Design sources (the OG image SVG); not published.
+scripts/build.py         Orchestrator.
+scripts/tnbuild/         yamlish · markdown · qr · crypto_addr · components · site · checks
+tests/                   Unit tests (stdlib unittest).
+docs/                    Internal research notes, not published.
+```
+
+### The `tnbuild` modules
+
+| Module | Why it exists |
+| --- | --- |
+| `yamlish.py` | Strict YAML-subset parser. Fails loudly with a line number rather than misparsing. |
+| `markdown.py` | Markdown → semantic HTML, including GFM tables with captions and stable heading ids. |
+| `qr.py` | Pure-Python QR encoder emitting inline SVG, so crypto pages need no third-party image service. Cross-validated against two independent implementations and decode-verified. |
+| `crypto_addr.py` | Address validation including a hand-rolled Keccak-256 (Monero uses original Keccak, not NIST SHA-3, so `hashlib.sha3_256` cannot be used). |
+| `components.py` | Shortcode expansion and reusable page furniture. |
+| `checks.py` | Secret scanning and output validation. |
+
+## Writing a page
+
+```markdown
+---
+title: "Page title"
+slug: "section/page-name"
+type: "article"          # page | article | index | tool | home
+topic: "Compute"
+description: "50–200 characters; validated."
+published: "2026-09-19"
+updated: "2026-09-19"
+verified: "2026-09-19"   # when the data was last checked against sources
+datasets: ["gpu-rental-hourly"]
+sources:
+  - title: "Provider pricing"
+    url: "https://example.com/pricing"
+    accessed: "2026-09-19"
+---
+
+# Page title
+
+{{summary}}   {{toc}}   {{dataset:gpu-rental-hourly}}   {{sources}}
+{{actions}}   {{referral:vastai|Rent a GPU}}   {{crypto:bitcoin}}
+{{tool:gpu-vs-api}}   {{disclosure}}   {{referral_table}}
+```
+
+Anything under `content/` with `slug: ""` becomes the home page; exactly one page must
+have it.
+
+## Editorial rules
+
+These are what the site is for, and they are load-bearing:
+
+- Every changing number carries an **observation date** and a **primary source**.
+- Arithmetic is **shown**, and datasets ship as JSON and CSV so conclusions can be recomputed.
+- Uncertainty is **stated** — ranges stay ranges, weak data is labelled weak.
+- Referral links are disclosed **inline**, and every page must remain worth reading with all of them removed.
+- No invented benchmarks, no review markup, no FAQ schema, no content generated in bulk from keyword lists.
+
+Full versions: [`/about/methodology/`](content/about/methodology.md) and
+[`/about/disclosure/`](content/about/disclosure.md).
+
+## Configuration
+
+`config.yaml` holds public values only — site metadata, crawler policy, public receiving
+addresses, and referral URLs. Every referral entry has a `plain_url` fallback, so
+disabling a programme leaves the pages correct and linking to the provider's ordinary
+URL.
+
+Never commit: private keys, seed phrases, API tokens, passwords, `.env` files.
 
 ## Deployment
 
-See [`DEPLOY.md`](DEPLOY.md) for the first deployment.
+See [`DEPLOY.md`](DEPLOY.md). `public/` is gitignored on purpose: Cloudflare Pages runs
+the build itself, so committing the output would only create drift.

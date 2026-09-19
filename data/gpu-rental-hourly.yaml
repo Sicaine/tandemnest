@@ -1,0 +1,158 @@
+name: "gpu-rental-hourly"
+title: "On-demand GPU rental prices, USD per hour per GPU"
+description: >
+  Advertised on-demand hourly price for a single GPU, taken from each provider's own
+  public pricing page on 19 September 2026. Prices are per GPU, not per instance.
+  Marketplace providers are recorded as an observed range rather than a fixed price.
+observed: "2026-09-19"
+method: >
+  Each figure was read from the provider's own pricing page on the observation date.
+  Where a provider publishes per-second pricing, the hourly figure is that rate times
+  3600. Where a provider sells only multi-GPU instances, the per-GPU figure is the
+  instance price divided by the GPU count and is marked as derived. Nothing here is
+  estimated or carried over from a previous observation.
+license: "CC BY 4.0"
+license_url: "https://creativecommons.org/licenses/by/4.0/"
+columns:
+  - key: provider
+    label: "Provider"
+  - key: gpu
+    label: "GPU"
+  - key: usd_per_hour
+    label: "USD/hour"
+    type: money
+    unit: "USD per GPU-hour"
+  - key: tier
+    label: "Tier or note"
+  - key: confidence
+    label: "Confidence"
+  - key: source
+    label: "Source"
+    type: url
+rows:
+  - provider: "RunPod"
+    gpu: "H100 SXM"
+    usd_per_hour: 3.49
+    tier: "Secure Cloud; Community Cloud 2.69"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "RunPod"
+    gpu: "H100 PCIe"
+    usd_per_hour: 2.89
+    tier: "Secure Cloud; Community Cloud 1.99"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "RunPod"
+    gpu: "H200"
+    usd_per_hour: 4.59
+    tier: "Secure Cloud; Community Cloud 3.59"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "RunPod"
+    gpu: "B200"
+    usd_per_hour: 6.79
+    tier: "Secure Cloud; Community Cloud 5.98"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "RunPod"
+    gpu: "A100 80GB SXM"
+    usd_per_hour: 1.59
+    tier: "Secure Cloud; Community Cloud 1.39"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "RunPod"
+    gpu: "L40S"
+    usd_per_hour: 1.09
+    tier: "Secure Cloud; Community Cloud 0.79"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "RunPod"
+    gpu: "RTX 4090"
+    usd_per_hour: 0.74
+    tier: "Secure Cloud; Community Cloud 0.34"
+    confidence: "high"
+    source: "https://www.runpod.io/pricing"
+  - provider: "Vast.ai"
+    gpu: "H100 SXM"
+    usd_per_hour: 3.10
+    tier: "Marketplace median; observed range 1.70-3.50 across ~8 listings"
+    confidence: "low, marketplace"
+    source: "https://vast.ai/pricing"
+  - provider: "Vast.ai"
+    gpu: "A100 80GB SXM4"
+    usd_per_hour: 0.70
+    tier: "Marketplace median; observed range 0.40-1.80 across ~15 listings"
+    confidence: "low, marketplace"
+    source: "https://vast.ai/pricing"
+  - provider: "Vast.ai"
+    gpu: "RTX 4090"
+    usd_per_hour: 0.50
+    tier: "Marketplace median; observed range 0.14-2.70 across ~62 listings"
+    confidence: "low, marketplace"
+    source: "https://vast.ai/pricing"
+  - provider: "Lambda"
+    gpu: "H100 SXM"
+    usd_per_hour: 4.29
+    tier: "Single GPU; 3.99 per GPU at 8x"
+    confidence: "medium"
+    source: "https://lambda.ai/service/gpu-cloud/pricing"
+  - provider: "Lambda"
+    gpu: "H100 PCIe"
+    usd_per_hour: 3.29
+    tier: "Single GPU"
+    confidence: "medium"
+    source: "https://lambda.ai/service/gpu-cloud/pricing"
+  - provider: "Lambda"
+    gpu: "A100 80GB SXM"
+    usd_per_hour: 2.79
+    tier: "Available only as an 8x configuration"
+    confidence: "medium"
+    source: "https://lambda.ai/service/gpu-cloud/pricing"
+  - provider: "DigitalOcean"
+    gpu: "H100 HGX"
+    usd_per_hour: 4.41
+    tier: "On demand; 3.26 on a 12-month reservation"
+    confidence: "medium"
+    source: "https://www.digitalocean.com/pricing/gpu-droplets"
+  - provider: "DigitalOcean"
+    gpu: "H200 HGX"
+    usd_per_hour: 4.47
+    tier: "On demand; 3.40 on a 12-month reservation"
+    confidence: "medium"
+    source: "https://www.digitalocean.com/pricing/gpu-droplets"
+  - provider: "DigitalOcean"
+    gpu: "L40S"
+    usd_per_hour: 1.57
+    tier: "GPU Droplet"
+    confidence: "medium"
+    source: "https://www.digitalocean.com/pricing/gpu-droplets"
+  - provider: "Modal"
+    gpu: "H100 SXM5"
+    usd_per_hour: 3.95
+    tier: "Serverless, billed per second at 0.001097 USD/s"
+    confidence: "medium"
+    source: "https://modal.com/pricing"
+  - provider: "Modal"
+    gpu: "A100 80GB"
+    usd_per_hour: 2.50
+    tier: "Serverless, billed per second"
+    confidence: "medium"
+    source: "https://modal.com/pricing"
+  - provider: "Modal"
+    gpu: "L40S"
+    usd_per_hour: 1.95
+    tier: "Serverless, billed per second"
+    confidence: "medium"
+    source: "https://modal.com/pricing"
+  - provider: "Replicate"
+    gpu: "H100"
+    usd_per_hour: 5.49
+    tier: "Fully managed, per second"
+    confidence: "medium"
+    source: "https://replicate.com/pricing"
+  - provider: "AWS EC2"
+    gpu: "H100 SXM"
+    usd_per_hour: 6.88
+    tier: "Derived: p5.48xlarge on-demand list 55.04/hr for 8 GPUs, us-east-1"
+    confidence: "high, derived"
+    source: "https://aws.amazon.com/ec2/pricing/on-demand/"

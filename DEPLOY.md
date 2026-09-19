@@ -1,100 +1,106 @@
-# TandemNest — tomorrow's rollout
+# Deploying TandemNest
 
-## 0. Prerequisites
+Target architecture, unchanged:
 
-- GitHub account/repository
-- Cloudflare account
-- `tandemnest.com` purchased
-- Python 3 installed locally
-
-No VPS is required.
-
-## 1. Configure the public identifiers
-
-Edit `config.yaml`:
-
-```yaml
-site:
-  url: "https://tandemnest.com"
-
-monetization:
-  xmr_mining:
-    enabled: true
-    wallet_address: "YOUR_PUBLIC_XMR_ADDRESS"
-  runpod:
-    enabled: true
-    referral_url: "YOUR_RUNPOD_REFERRAL_URL"
-  digitalocean:
-    enabled: true
-    referral_url: "YOUR_DIGITALOCEAN_REFERRAL_URL"
+```text
+GitHub → Cloudflare Pages → tandemnest.com
 ```
 
-Only publish public receiving addresses and referral URLs. Never put private keys, wallet seeds, API tokens or passwords in this repository.
+No VPS, no database, no server-side runtime, no paid service.
 
-## 2. Test locally
+## 1. Check locally first
 
 ```bash
-python3 scripts/build.py
-python3 -m http.server 8000 --directory public
+make validate
 ```
 
-Open http://localhost:8000 and check every link.
-
-## 3. Create the GitHub repo
-
-Create an empty repository named `tandemnest` (public is preferable for this experiment), then:
+This runs the unit tests, builds the site, and validates the output. If it fails
+locally it will fail in CI and on Cloudflare — fix it here, where the loop is fastest.
 
 ```bash
-git remote add origin git@github.com:YOUR_GITHUB_USER/tandemnest.git
+make serve   # http://localhost:8000
+```
+
+## 2. Push to GitHub
+
+The repository can be private; Cloudflare Pages works with private repositories.
+
+```bash
 git add .
-git commit -m "Initial TandemNest site"
+git commit -m "Rebuild TandemNest"
 git push -u origin main
 ```
 
-If you use HTTPS instead of SSH, use the equivalent GitHub remote.
+`public/` is gitignored. Do not commit build output — Cloudflare builds it.
 
-## 4. Cloudflare Pages
+## 3. Create the Cloudflare Pages project
 
-In Cloudflare: Workers & Pages → Create application → Pages → Connect to Git.
+Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**.
 
-Select the `tandemnest` repository.
+| Setting | Value |
+| --- | --- |
+| Framework preset | None |
+| Build command | `python3 scripts/build.py --check` |
+| Build output directory | `public` |
+| Root directory | `/` |
 
-Build settings:
+No environment variables are needed, and there is nothing to install: the build uses
+only the Python standard library.
 
-- Framework preset: None
-- Build command: `python3 scripts/build.py`
-- Build output directory: `public`
-- Root directory: `/`
+**Use `--check`.** It turns a broken link, an unverifiable crypto address or a
+secret-shaped string into a failed deploy instead of a published mistake.
 
-Deploy.
+## 4. Attach the domain
 
-## 5. Attach tandemnest.com
+In the Pages project → **Custom domains** → add `tandemnest.com`, then add
+`www.tandemnest.com` and let Cloudflare redirect it to the apex. Two hostnames serving
+the same content is a genuine duplicate-content problem; one must redirect.
 
-In the Pages project, add `tandemnest.com` and follow Cloudflare's DNS/nameserver instructions.
+Every page declares `https://tandemnest.com/…` as its canonical URL, so until the domain
+is attached those canonicals point at a host that does not serve the site.
 
-Do not add a VPS or origin server yet.
+## 5. Leave the security settings alone
 
-## 6. Verify
+This matters more than it sounds.
 
-Check:
+**Do not enable** Bot Fight Mode, an aggressive WAF ruleset, or "I'm Under Attack" mode.
+They serve JavaScript challenges that crawlers cannot pass, which would make the site
+invisible to Google, to AI search crawlers, and to the user-directed fetchers that
+retrieve a page when someone asks an assistant about it — the entire audience this site
+was built for.
 
-- `https://tandemnest.com/`
-- `https://tandemnest.com/robots.txt`
-- `https://tandemnest.com/sitemap.xml`
-- `https://tandemnest.com/llms.txt`
-- `https://tandemnest.com/agent-index.json`
-- `/crypto/`
-- `/compute/`
-- `/ai/`
+A static site with no forms, no database and no server-side code has nothing for those
+features to protect. Cloudflare's defaults are already appropriate.
 
-## 7. First 48 hours
+## 6. Verify the deployment
 
-Do not mass-publish. Get the first pages genuinely useful, then submit the sitemap in Google Search Console and watch:
+```bash
+curl -sI https://tandemnest.com/ | head -1                    # expect HTTP/2 200
+curl -s  https://tandemnest.com/robots.txt | head -5
+curl -s  https://tandemnest.com/sitemap.xml | grep -c '<loc>'  # expect 19
+curl -s  https://tandemnest.com/agent-index.json | head -5
+curl -s  https://tandemnest.com/data/gpu-rental-hourly.csv | head -3
+curl -s  https://tandemnest.com/ | grep -o '<link rel="canonical"[^>]*>'
+```
 
-- impressions
-- indexed pages
-- referral clicks
-- direct agent/bot traffic
-- conversions
+Then check that the site is readable with JavaScript disabled. Everything except the
+calculator's live updates and the copy buttons must still work — that is a hard
+requirement, not an aspiration.
 
-Keep the first experiment small enough that we can tell what actually caused a result.
+## 7. Search Console
+
+Add a **Domain** property for `tandemnest.com` (not URL-prefix), verify via the TXT
+record in Cloudflare DNS, and submit `sitemap.xml`.
+
+The generative-AI performance report shows AI Overviews and AI Mode impressions. It
+reports impressions only, with no click data, and does not separate the two surfaces.
+
+## 8. After launch
+
+Do not mass-publish. The site is deliberately small so that a result can be attributed
+to a cause. Wait for indexing, see which pages get impressions, and record what happens
+in `content/about/experiments.md` — including the negative results.
+
+Re-verification is the recurring cost of this site's whole premise: the prices carry
+observation dates, and those dates are only worth anything if someone goes back and
+checks them.

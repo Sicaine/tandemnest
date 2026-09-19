@@ -1,31 +1,154 @@
+# TandemNest site configuration.
+#
+# PUBLIC VALUES ONLY. Everything in this file is published to the web.
+# Never put a private key, seed phrase, API token, or password here.
+# `make check` scans this file (and all build output) for secret-shaped values
+# and fails the build if it finds one.
+
 site:
   name: "TandemNest"
-  description: "Practical guides, tools and experiments for autonomous agents, compute and crypto."
+  tagline: "Dated, reproducible cost research for people and agents renting compute."
+  description: "Independent, dated cost research on GPU rental, LLM inference pricing and agent payment rails. Every number carries a source and an observation date."
   url: "https://tandemnest.com"
   language: "en"
-  author: ""
-  default_og_image: "/assets/og-default.svg"
-
-monetization:
-  xmr_mining:
-    enabled: true
-    wallet_address: "4AhLpxDk3Hj38oYnsBeuevU9pSzZKApQLikc4u9K3cNm6jGMFTTaEWqHdumKwPtD4SWhD3W336BtuM4qmsQk1E9VEknffpY"
-    pool_referral_url: ""
-  runpod:
-    enabled: true
-    referral_url: "https://runpod.io?ref=8l6dgsok"
-  digitalocean:
-    enabled: false
-    referral_url: ""
-  generic:
-    affiliate_disclosure: "Some links on this site may be referral links. If you use them, I may receive a commission or account credit at no extra cost to you."
-
-seo:
-  title_suffix: " | TandemNest"
-  robots: "index,follow"
-  sitemap: true
-  schema_org: true
+  locale: "en_US"
+  operator: "TandemNest is run by one independent developer."
+  repository: ""            # public source repository URL, if you publish one
+  contact: ""               # optional public contact address
 
 build:
   output_dir: "public"
-  site_dir: "."
+  strict: true              # treat validation warnings as build failures
+
+seo:
+  title_suffix: " · TandemNest"
+  default_robots: "index,follow,max-image-preview:large"
+
+# Crawler policy. Every token below is taken from the operator's own published
+# documentation; see content/about/crawler-policy.md for the source list.
+# The policy is deliberately open: this site exists to be read and cited.
+crawlers:
+  disallow_paths:
+    - "/assets/tmp/"
+  # Crawlers granted an explicit Allow block, so the intent is unambiguous even
+  # if a future default rule changes.
+  named:
+    - token: "Googlebot"
+      vendor: "Google"
+      purpose: "Google Search indexing, which is also what feeds AI Overviews and AI Mode"
+      docs: "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers"
+    - token: "Google-Extended"
+      vendor: "Google"
+      purpose: "Opt-in signal for Gemini/Vertex generative model training; does not affect Search ranking"
+      docs: "https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers"
+    - token: "GPTBot"
+      vendor: "OpenAI"
+      purpose: "Training data collection"
+      docs: "https://developers.openai.com/api/docs/bots"
+    - token: "OAI-SearchBot"
+      vendor: "OpenAI"
+      purpose: "Indexing for ChatGPT search results"
+      docs: "https://developers.openai.com/api/docs/bots"
+    - token: "ChatGPT-User"
+      vendor: "OpenAI"
+      purpose: "User-initiated page fetch from inside ChatGPT"
+      docs: "https://developers.openai.com/api/docs/bots"
+    - token: "ClaudeBot"
+      vendor: "Anthropic"
+      purpose: "Training data collection"
+      docs: "https://support.claude.com/en/articles/8896518"
+    - token: "Claude-User"
+      vendor: "Anthropic"
+      purpose: "Fetches a page because a Claude user asked about it"
+      docs: "https://support.claude.com/en/articles/8896518"
+    - token: "Claude-SearchBot"
+      vendor: "Anthropic"
+      purpose: "Crawling to improve Claude search result quality"
+      docs: "https://support.claude.com/en/articles/8896518"
+    - token: "PerplexityBot"
+      vendor: "Perplexity"
+      purpose: "Answer-engine index"
+      docs: "https://docs.perplexity.ai/docs/resources/perplexity-crawlers"
+    - token: "Applebot"
+      vendor: "Apple"
+      purpose: "Siri, Spotlight and Safari search"
+      docs: "https://support.apple.com/en-us/119829"
+    - token: "Applebot-Extended"
+      vendor: "Apple"
+      purpose: "Opt-in signal for Apple foundation model training"
+      docs: "https://support.apple.com/en-us/119829"
+    - token: "CCBot"
+      vendor: "Common Crawl"
+      purpose: "Open web corpus used by many research datasets"
+      docs: "https://commoncrawl.org/ccbot"
+    - token: "Amazonbot"
+      vendor: "Amazon"
+      purpose: "Indexing for Amazon products and assistants"
+      docs: "https://developer.amazon.com/amazonbot"
+
+# Public receiving addresses. Leave `receiving_address` empty until you have
+# pasted a PUBLIC address you control; the build validates the checksum and
+# refuses to publish an address that does not verify.
+crypto:
+  bitcoin:
+    enabled: true
+    asset: "BTC"
+    network: "mainnet"
+    receiving_address: ""
+    label: "TandemNest"
+    purpose: "Voluntary support for the research published on this site."
+  monero:
+    enabled: true
+    asset: "XMR"
+    network: "mainnet"
+    receiving_address: "4AhLpxDk3Hj38oYnsBeuevU9pSzZKApQLikc4u9K3cNm6jGMFTTaEWqHdumKwPtD4SWhD3W336BtuM4qmsQk1E9VEknffpY"
+    label: "TandemNest"
+    purpose: "Voluntary support for the research published on this site."
+
+# Referral relationships.
+#
+# `url` is the referral link. `plain_url` is the provider's ordinary URL and is
+# ALWAYS used when the referral link is not configured, so that no page ever
+# depends on a referral link existing. Disable a provider and the pages stay
+# correct and useful -- that is the quality test.
+referrals:
+  vastai:
+    enabled: true
+    name: "Vast.ai"
+    url: "https://cloud.vast.ai/?ref_id=706161"
+    plain_url: "https://vast.ai/"
+    payout: "3% of referred spend for the life of the referred account; taken as credit at 100% of value, or cash at 75%. Cash withdrawal requires referral earnings to exceed the account's own lifetime instance charges"
+    payout_short: "3% of what you spend, for as long as you use them"
+    payout_kind: "cash-or-credit"
+    terms: "https://docs.vast.ai/guides/reference/referral-program"
+  runpod:
+    enabled: true
+    name: "RunPod"
+    url: "https://runpod.io?ref=8l6dgsok"
+    plain_url: "https://www.runpod.io/"
+    payout: "Tier 1 referral pays account credit only; the 10% cash affiliate tier unlocks after 25 paying referrals"
+    payout_short: "account credit only, expiring after 90 days"
+    payout_kind: "credit"
+    terms: "https://docs.runpod.io/accounts-billing/referrals"
+  digitalocean:
+    enabled: false
+    name: "DigitalOcean"
+    url: ""
+    plain_url: "https://www.digitalocean.com/"
+    payout: "Affiliate programme via Awin pays 10% of referred spend monthly for 12 months in cash; the in-app referral pays $25 credit"
+    payout_short: "10% of your spend for 12 months"
+    payout_kind: "cash"
+    terms: "https://www.digitalocean.com/legal/affiliate-program-agreement"
+
+disclosure:
+  short: "Some outbound links are referral links. They never change the price you pay, and they are labelled where they appear."
+  long: |
+    TandemNest is funded partly by referral links. When a link is a referral
+    link it is marked as such next to the link, and it carries rel="sponsored
+    nofollow". If a provider's referral programme is not configured, the same
+    link points at the provider's ordinary URL instead.
+    No provider has paid for placement, reviewed this content before
+    publication, or been given any editorial input. Every recommendation is
+    derived from the dated measurements and prices published on the page, and
+    every page is written so that it remains complete and useful with all
+    referral links removed.

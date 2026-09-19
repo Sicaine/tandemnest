@@ -1,0 +1,82 @@
+<form class="tool" id="gpu-vs-api" aria-labelledby="calc-heading">
+<h2 id="calc-heading">Break-even calculator</h2>
+<p class="note">Everything is computed in your browser. Nothing is sent anywhere, and there is no
+tracking on this page. The formulas are printed below the calculator so you can check them.</p>
+
+<fieldset>
+<legend>Your workload</legend>
+<div class="field-grid">
+  <div class="field">
+    <label for="f-tokens">Tokens per month (millions)</label>
+    <input id="f-tokens" name="tokens" type="number" min="0" step="any" value="500" inputmode="decimal">
+    <p class="hint">Input plus output combined.</p>
+  </div>
+  <div class="field">
+    <label for="f-outShare">Share that is output (%)</label>
+    <input id="f-outShare" name="outShare" type="number" min="0" max="100" step="any" value="25">
+    <p class="hint">Output tokens usually cost several times more than input.</p>
+  </div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Renting a GPU</legend>
+<div class="field-grid">
+  <div class="field">
+    <label for="f-gpuPrice">GPU price (USD per hour, each)</label>
+    <input id="f-gpuPrice" name="gpuPrice" type="number" min="0" step="any" value="2.00" inputmode="decimal">
+  </div>
+  <div class="field">
+    <label for="f-gpuCount">Number of GPUs</label>
+    <input id="f-gpuCount" name="gpuCount" type="number" min="1" step="1" value="1">
+  </div>
+  <div class="field">
+    <label for="f-tps">Output tokens per second, per GPU</label>
+    <input id="f-tps" name="tps" type="number" min="0" step="any" value="1500" inputmode="decimal">
+    <p class="hint">Throughput under batching, not single-stream speed. This input dominates the result.</p>
+  </div>
+  <div class="field">
+    <label for="f-util">Useful utilisation (%)</label>
+    <input id="f-util" name="util" type="number" min="1" max="100" step="any" value="40">
+    <p class="hint">Real traffic is bursty. A GPU you rent is paid for whether or not it is busy.</p>
+  </div>
+  <div class="field">
+    <label for="f-mode">Billing model</label>
+    <select id="f-mode" name="mode">
+      <option value="per-second" selected>Rent only while generating (per-second billing)</option>
+      <option value="always-on">Keep an endpoint up 24/7 (730 h per month)</option>
+    </select>
+    <p class="hint">This choice decides whether a break-even volume exists at all.</p>
+  </div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Hosted API prices</legend>
+<div class="field-grid">
+  <div class="field">
+    <label for="f-apiIn">USD per million input tokens</label>
+    <input id="f-apiIn" name="apiIn" type="number" min="0" step="any" value="0.30" inputmode="decimal">
+  </div>
+  <div class="field">
+    <label for="f-apiOut">USD per million output tokens</label>
+    <input id="f-apiOut" name="apiOut" type="number" min="0" step="any" value="1.20" inputmode="decimal">
+  </div>
+</div>
+</fieldset>
+
+<output for="f-tokens f-gpuPrice f-tps f-apiIn f-apiOut" aria-live="polite">
+  <div class="result-grid" data-js-only hidden>
+    <div class="result"><span class="label">Self-hosted, per month</span><span class="value" id="o-selfCost">—</span></div>
+    <div class="result"><span class="label">Hosted API, per month</span><span class="value" id="o-apiCost">—</span></div>
+    <div class="result"><span class="label">Self-hosted per 1M tokens</span><span class="value" id="o-selfPerM">—</span></div>
+    <div class="result"><span class="label">API per 1M tokens (blended)</span><span class="value" id="o-apiPerM">—</span></div>
+    <div class="result"><span class="label">GPU time needed</span><span class="value" id="o-hours">—</span></div>
+    <div class="result"><span class="label">Break-even volume</span><span class="value" id="o-breakeven">—</span></div>
+  </div>
+  <p class="verdict" id="o-verdict" data-js-only hidden>—</p>
+  <p class="note" id="o-capacity" data-js-only hidden>—</p>
+  <p class="nojs">This calculator needs JavaScript to update live. The formulas below give the same
+  answer with a pocket calculator, and the worked example on this page is computed from them.</p>
+</output>
+</form>

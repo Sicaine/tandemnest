@@ -1,4 +1,5 @@
-name: Build site
+name: build
+
 on:
   push:
   pull_request:
@@ -11,15 +12,67 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Build
-        run: python3 scripts/build.py
-      - name: Smoke test
+
+      # The build has no third-party dependencies on purpose, so there is no
+      # install step here and nothing to cache.
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -q
+
+      - name: Build and validate output
+        run: python3 scripts/build.py --check
+
+      - name: The private task file must never be committed
         run: |
-          test -f public/index.html
-          test -f public/robots.txt
-          test -f public/sitemap.xml
-          test -f public/llms.txt
-          test -f public/agent-index.json
+          if git ls-files --error-unmatch "TODO STEP BY STEP.html" >/dev/null 2>&1; then
+            echo "::error::'TODO STEP BY STEP.html' is tracked by git. It is private and must stay untracked."
+            exit 1
+          fi
+          if [ -e "public/TODO STEP BY STEP.html" ]; then
+            echo "::error::the private task file reached the build output"
+            exit 1
+          fi
+
+      - name: Generated output must be complete
+        run: |
+          set -e
+          for f in index.html robots.txt sitemap.xml llms.txt agent-index.json feed.xml _headers \
+                   data/gpu-rental-hourly.json data/gpu-rental-hourly.csv; do
+            test -s "public/$f" || { echo "::error::missing or empty public/$f"; exit 1; }
+          done
+          python3 - <<'PY'
+          import json, pathlib, re, sys
+          out = pathlib.Path("public")
+
+          # agent-index.json must be valid JSON with pages in it.
+          index = json.loads((out / "agent-index.json").read_text())
+          assert index["pages"], "agent-index.json lists no pages"
+
+          # Every canonical URL must be absolute and point at the real domain.
+          bad = []
+          for page in out.rglob("*.html"):
+              text = page.read_text()
+              m = re.search(r'<link rel="canonical" href="([^"]+)"', text)
+              if not m or not m.group(1).startswith("https://tandemnest.com/"):
+                  bad.append(str(page))
+          assert not bad, f"bad or missing canonical URLs: {bad}"
+
+          # Sitemap must not be empty and must be well-formed XML.
+          import xml.etree.ElementTree as ET
+          root = ET.fromstring((out / "sitemap.xml").read_text())
+          locs = root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+          assert locs, "sitemap.xml contains no URLs"
+          print(f"ok: {len(index['pages'])} pages indexed, {len(locs)} URLs in sitemap")
+          PY
+
+      - name: Build must be deterministic
+        run: |
+          find public -type f | sort | xargs sha256sum > /tmp/first.sha
+          python3 scripts/build.py --quiet
+          find public -type f | sort | xargs sha256sum > /tmp/second.sha
+          diff /tmp/first.sha /tmp/second.sha \
+            || { echo "::error::build output is not reproducible"; exit 1; }
+          echo "ok: byte-identical rebuild"

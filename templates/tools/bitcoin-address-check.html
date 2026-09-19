@@ -1,0 +1,21 @@
+<form class="tool" id="btc-check" aria-labelledby="checker-heading">
+<h2 id="checker-heading">Check an address</h2>
+<p class="note">Runs entirely in your browser. The address you type is never sent anywhere,
+never stored, and never logged — this page has no analytics and makes no network requests.</p>
+<div class="field">
+  <label for="f-address">Bitcoin address</label>
+  <input id="f-address" name="address" type="text" spellcheck="false" autocomplete="off"
+         autocapitalize="none" placeholder="bc1p… / bc1q… / 1… / 3…"
+         aria-describedby="o-result">
+</div>
+<p class="cta">
+  <button type="button" class="btn" data-fill="bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0">Try a Taproot address</button>
+  <button type="button" class="btn" data-fill="bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqh2y7hd">Try the bech32m trap</button>
+  <button type="button" class="btn" data-fill="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa">Try a legacy address</button>
+</p>
+<output id="o-result" aria-live="polite">
+  <p class="nojs">This checker needs JavaScript. With scripting off, the page still documents
+  every validation rule it applies, and the test vectors on
+  <a href="/crypto/bitcoin/">the Bitcoin page</a> let you verify any other implementation.</p>
+</output>
+</form>
