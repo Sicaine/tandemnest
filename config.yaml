@@ -12,8 +12,8 @@ monetization:
     wallet_address: "4AhLpxDk3Hj38oYnsBeuevU9pSzZKApQLikc4u9K3cNm6jGMFTTaEWqHdumKwPtD4SWhD3W336BtuM4qmsQk1E9VEknffpY"
     pool_referral_url: ""
   runpod:
-    enabled: false
-    referral_url: ""
+    enabled: true
+    referral_url: "https://runpod.io?ref=8l6dgsok"
   digitalocean:
     enabled: false
     referral_url: ""
